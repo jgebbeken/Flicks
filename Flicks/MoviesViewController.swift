@@ -7,7 +7,8 @@
 //
 
 import UIKit
-import AFNetworking
+import AFNetworking // adds in image url support
+import EZLoadingActivity
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -22,8 +23,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.delegate = self
 
        // Do any additional setup after loading the view.
-        
-        
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
@@ -45,6 +44,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             
                             // Reload table data
                             self.tableView.reloadData()
+                            
+                           //Finished loading
+                           EZLoadingActivity.hide(success: true, animated: true)
+                            print("loading complete")
+                          
                             
                     }
                 }
@@ -68,6 +72,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             
         } else {
             
+            
+            // Return count of 0 so that the app does not crash.
             return 0
             
         }
@@ -96,6 +102,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
         
         
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        //Adding in loading HUD state while waiting for movies API. Stop user interactions until the loading is finished
+        EZLoadingActivity.showWithDelay("Loading Movies...", disableUI: true, seconds: 2)
+        print("loading movies HUD")
+
     }
     
 
