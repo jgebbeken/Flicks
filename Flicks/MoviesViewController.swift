@@ -17,12 +17,21 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var movies: [NSDictionary]?
     
     var refreshControl: UIRefreshControl!
+    let noNetworklabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.dataSource = self
         tableView.delegate = self
+        
+        // No network warning label
+        
+        noNetworklabel.textAlignment = NSTextAlignment.Center
+        noNetworklabel.text = "No Network"
+        noNetworklabel.backgroundColor = UIColor.orangeColor()
+        tableView.insertSubview(noNetworklabel, atIndex: 1)
+        noNetworklabel.hidden = true
         
         
         // Refresh controls added to table view
@@ -102,12 +111,23 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         // Return movies count if there is any movies otherwise return 0 if there isn't any.
         if let movies = movies {
+            
+            if noNetworklabel.hidden == false
+            {
+                noNetworklabel.hidden = true
+            }
+            
+            
             return movies.count
+            
+          
             
         } else {
             
             
             // Return count of 0 so that the app does not crash.
+            noNetworklabel.hidden = false
+            
             return 0
             
         }
