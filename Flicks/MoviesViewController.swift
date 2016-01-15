@@ -137,7 +137,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         // Get poster image and set animation options.
         cell.posterView.setImageWithURLRequest(request, placeholderImage: placeholderImage, success: { (request, response, imageData) -> Void in
-            UIView.transitionWithView(cell.posterView, duration: 1.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData; cell.posterView.alpha = 2.0 }, completion: nil   )
+            UIView.transitionWithView(cell.posterView, duration: 1.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData; cell.posterView.alpha = 2.0 }, completion: nil   );
+            
+            // If response was nil due to image being already cached then do this instead
+            if response == nil {
+                // Fade out images
+                UIView.animateWithDuration(0.1, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations:{ cell.posterView.alpha = 0}, completion: nil)
+                
+                // Fade in cached images
+                UIView.animateWithDuration(1.0, delay: 2.0, options: UIViewAnimationOptions.CurveEaseIn, animations:{ cell.posterView.alpha = 1}, completion: nil) }
             }, failure: nil)
         
         
