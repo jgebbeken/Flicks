@@ -66,7 +66,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    // onRefresh Method
+    // onRefresh Methods
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
             dispatch_time(
@@ -77,9 +77,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func onRefresh() {
-        delay(2, closure: {
+        
+        
+        
+        delay(4, closure: {
+            
             self.refreshControl.endRefreshing()
+            
         })
+        
+    
+        
     }
     
     
@@ -125,10 +133,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Older non - fade in code
         //cell.posterView.setImageWithURL(imageUrl!)
         
+        cell.posterView.alpha = 0
         
         // Get poster image and set animation options.
         cell.posterView.setImageWithURLRequest(request, placeholderImage: placeholderImage, success: { (request, response, imageData) -> Void in
-            UIView.transitionWithView(cell.posterView, duration: 0.45, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData }, completion: nil   )
+            UIView.transitionWithView(cell.posterView, duration: 1.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData; cell.posterView.alpha = 2.0 }, completion: nil   )
             }, failure: nil)
         
         
