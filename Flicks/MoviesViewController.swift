@@ -44,9 +44,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             
                             // Reload table data
                             self.tableView.reloadData()
-                            
-                           //Finished loading
-                           EZLoadingActivity.hide(success: true, animated: true)
+
                             print("loading complete")
                           
                             
@@ -96,9 +94,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         cell.posterView.setImageWithURL(imageUrl!)
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
-        
-        
-        print("row \(indexPath.row)")
+
         return cell
         
         
