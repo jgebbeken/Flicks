@@ -118,8 +118,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let posterPath = movie["poster_path"] as! String
         
         let imageUrl = NSURL(string: baseUrl + posterPath)
+        let request = NSURLRequest(URL: imageUrl!)
+        let placeholderImage = UIImage(named: "MovieHolder")
         
-        cell.posterView.setImageWithURL(imageUrl!)
+        
+        // Older non - fade in code
+        //cell.posterView.setImageWithURL(imageUrl!)
+        
+        
+        // Get poster image and set animation options.
+        cell.posterView.setImageWithURLRequest(request, placeholderImage: placeholderImage, success: { (request, response, imageData) -> Void in
+            UIView.transitionWithView(cell.posterView, duration: 0.45, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData }, completion: nil   )
+            }, failure: nil)
+        
+        
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
 
