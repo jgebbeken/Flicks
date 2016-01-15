@@ -16,11 +16,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     var movies: [NSDictionary]?
     
+    var refreshControl: UIRefreshControl!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.dataSource = self
         tableView.delegate = self
+        
+        
+        // Refresh controls added to table view
+        refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
+        tableView.insertSubview(refreshControl, atIndex: 0)
+        
 
        // Do any additional setup after loading the view.
         
@@ -54,6 +63,24 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         task.resume()
         
     }
+    
+    
+    // onRefresh Method
+    func delay(delay:Double, closure:()->()) {
+        dispatch_after(
+            dispatch_time(
+                DISPATCH_TIME_NOW,
+                Int64(delay * Double(NSEC_PER_SEC))
+            ),
+            dispatch_get_main_queue(), closure)
+    }
+    
+    func onRefresh() {
+        delay(2, closure: {
+            self.refreshControl.endRefreshing()
+        })
+    }
+    
     
     
 
