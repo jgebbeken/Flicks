@@ -27,6 +27,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         // Refresh controls added to table view
         refreshControl = UIRefreshControl()
+        refreshControl.tintColor = UIColor.whiteColor()
         refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
         tableView.insertSubview(refreshControl, atIndex: 0)
         
