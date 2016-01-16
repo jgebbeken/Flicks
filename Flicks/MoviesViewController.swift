@@ -28,7 +28,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // No network warning label
         
         noNetworklabel.textAlignment = NSTextAlignment.Center
-        noNetworklabel.text = "No Network"
+        noNetworklabel.text = "No Network. Pull to refresh."
         noNetworklabel.backgroundColor = UIColor.orangeColor()
         tableView.insertSubview(noNetworklabel, atIndex: 1)
         noNetworklabel.hidden = true
@@ -142,10 +142,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
+        if let posterPath = movie["poster_path"] as? String {
         let baseUrl = "http://image.tmdb.org/t/p/w500"
-        let posterPath = movie["poster_path"] as! String
         
         let imageUrl = NSURL(string: baseUrl + posterPath)
+        
         let request = NSURLRequest(URL: imageUrl!)
         let placeholderImage = UIImage(named: "MovieHolder")
         
@@ -167,7 +168,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 // Fade in cached images
                 UIView.animateWithDuration(1.0, delay: 2.0, options: UIViewAnimationOptions.CurveEaseIn, animations:{ cell.posterView.alpha = 1}, completion: nil) }
             }, failure: nil)
-        
+        }
+        else
+        {
+            cell.posterView.image = UIImage(named: "Rgvbn3m.jpg")
+            
+        }
         
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
