@@ -9,6 +9,7 @@
 import UIKit
 import AFNetworking // adds in image url support
 import EZLoadingActivity
+import MBProgressHUD
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -153,7 +154,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         // Older non - fade in code
         //cell.posterView.setImageWithURL(imageUrl!)
-        
+    
         cell.posterView.alpha = 0
         
         // Get poster image and set animation options.
@@ -183,12 +184,38 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
+    
+    func loadDataFromNetwork() {
+        
+        // ... Create the NSURLRequest (myRequest) ...
+        
+        let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
+        let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let myRequest = NSURLRequest(URL: url!)
+        
+        // Configure session so that completion handler is executed on main UI thread
+        let session = NSURLSession(
+            configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
+            delegate:nil,
+            delegateQueue:NSOperationQueue.mainQueue()
+        )
+        
+        // Display HUD right before the request is made
+        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        
+        let task : NSURLSessionDataTask = session.dataTaskWithRequest(myRequest,
+            completionHandler: { (data, response, error) in
+                
+                // Hide HUD once the network request comes back (must be done on main UI thread)
+                MBProgressHUD.hideHUDForView(self.view, animated: true)
+                
+                // ... Remainder of response handling code ...
+                
+        });
+        task.resume()
+    }
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        
-        //Adding in loading HUD state while waiting for movies API. Stop user interactions until the loading is finished
-        EZLoadingActivity.showWithDelay("Loading Movies...", disableUI: true, seconds: 2)
-        print("loading movies HUD")
 
     }
     
