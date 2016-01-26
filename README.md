@@ -23,7 +23,7 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-- [ ] List anything else that you can get done to improve the app functionality!
+- [x] If poster image is not available then a no image placeholder will take its place.
 
 ## Video Walkthrough 
 
