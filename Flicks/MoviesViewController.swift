@@ -53,6 +53,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             delegateQueue:NSOperationQueue.mainQueue()
         )
         
+        // Start loading state HUD
+        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        
+        
         let task : NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
                 if let data = dataOrNil {
@@ -61,6 +65,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             NSLog("response: \(responseDictionary)")
                             
                             self.movies = responseDictionary["results"] as! [NSDictionary]
+                            
+                            // End loading state HUD
+                            MBProgressHUD.hideHUDForView(self.view, animated: true)
                             
                             // Reload table data
                             self.tableView.reloadData()
@@ -170,6 +177,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 UIView.animateWithDuration(1.0, delay: 2.0, options: UIViewAnimationOptions.CurveEaseIn, animations:{ cell.posterView.alpha = 1}, completion: nil) }
             }, failure: nil)
         }
+            
+        // For posters who don't have a poster view yet.
         else
         {
             cell.posterView.image = UIImage(named: "Rgvbn3m.jpg")
@@ -185,35 +194,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    func loadDataFromNetwork() {
-        
-        // ... Create the NSURLRequest (myRequest) ...
-        
-        let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-        let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
-        let myRequest = NSURLRequest(URL: url!)
-        
-        // Configure session so that completion handler is executed on main UI thread
-        let session = NSURLSession(
-            configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
-            delegate:nil,
-            delegateQueue:NSOperationQueue.mainQueue()
-        )
-        
-        // Display HUD right before the request is made
-        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
-        
-        let task : NSURLSessionDataTask = session.dataTaskWithRequest(myRequest,
-            completionHandler: { (data, response, error) in
-                
-                // Hide HUD once the network request comes back (must be done on main UI thread)
-                MBProgressHUD.hideHUDForView(self.view, animated: true)
-                
-                // ... Remainder of response handling code ...
-                
-        });
-        task.resume()
-    }
+    
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
