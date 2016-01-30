@@ -21,7 +21,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var filteredMovies: [NSDictionary] = []
     var refreshControl: UIRefreshControl!
     var filteredText: [String]!
-    let noNetworklabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
+    let noNetworkButton = UIButton(frame: CGRectMake(0, 0, 320, 50))
     
     
     override func viewDidLoad() {
@@ -30,17 +30,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         searchBar.delegate = self
-    
         
         
         // No network warning label
         
-        noNetworklabel.textAlignment = NSTextAlignment.Center
-        noNetworklabel.text = "No Network."
-        noNetworklabel.backgroundColor = UIColor.orangeColor()
-        tableView.insertSubview(noNetworklabel, atIndex: 1)
-        noNetworklabel.hidden = true
-        
+        noNetworkButton.setTitle("No Network press to refresh", forState: .Normal)
+        noNetworkButton.backgroundColor = UIColor.orangeColor()
+        tableView.insertSubview(noNetworkButton, atIndex: 1)
+        noNetworkButton.addTarget(self, action: "networkErrorRefresh", forControlEvents: .TouchUpInside)
+        noNetworkButton.hidden = true
+    
         
         // Refresh controls added to table view
         refreshControl = UIRefreshControl()
@@ -48,7 +47,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
         tableView.insertSubview(refreshControl, atIndex: 0)
         
-
+        
+        // Load Movie Data
+        getMovieData()
+        
+    }
+    
+    func getMovieData () -> () {
        // Do any additional setup after loading the view.
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
@@ -85,10 +90,80 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             print("loading complete")
                     }
                 }
+                if error != nil {
+                    self.showNetworkError()
+                }
         });
         task.resume()
         
     }
+    
+    
+    func showNetworkError () -> () {
+        
+        // Show no NetworkLabel and hide searchBar from view in till network is up.
+        noNetworkButton.hidden = false
+        searchBar.hidden = true
+        getMovieData()
+    }
+    
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
+        
+        let movie = filteredMovies[indexPath.row]
+        let title = movie["title"] as! String
+        let overview = movie["overview"] as! String
+        
+        if let posterPath = movie["poster_path"] as? String {
+            let baseUrl = "http://image.tmdb.org/t/p/w500"
+            
+            let imageUrl = NSURL(string: baseUrl + posterPath)
+            
+            let request = NSURLRequest(URL: imageUrl!)
+            let placeholderImage = UIImage(named: "MovieHolder")
+            
+            
+            // Older non - fade in code
+            //cell.posterView.setImageWithURL(imageUrl!)
+            
+            cell.posterView.alpha = 0
+            
+            // Get poster image and set animation options.
+            cell.posterView.setImageWithURLRequest(request, placeholderImage: placeholderImage, success: { (request, response, imageData) -> Void in
+                UIView.transitionWithView(cell.posterView, duration: 1.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData; cell.posterView.alpha = 2.0 }, completion: nil   );
+                
+                // If response was nil due to image being already cached then do this instead
+                if response == nil {
+                    // Fade out images
+                    UIView.animateWithDuration(0.1, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations:{ cell.posterView.alpha = 0}, completion: nil)
+                    
+                    // Fade in cached images
+                    UIView.animateWithDuration(1.0, delay: 2.0, options: UIViewAnimationOptions.CurveEaseIn, animations:{ cell.posterView.alpha = 1}, completion: nil) }
+                }, failure: nil)
+        }
+            
+            // For posters who don't have a poster view yet.
+        else
+        {
+            cell.posterView.image = UIImage(named: "Rgvbn3m.jpg")
+            
+        }
+        
+        cell.titleLabel.text = title
+        cell.overviewLabel.text = overview
+        
+        return cell
+        
+        
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        return filteredMovies.count
+    }
+
     
     
     // onRefresh Methods
@@ -115,69 +190,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-            return filteredMovies.count
-    }
-    
-    
-    
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
-        
-        let movie = filteredMovies[indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
-        
-        if let posterPath = movie["poster_path"] as? String {
-        let baseUrl = "http://image.tmdb.org/t/p/w500"
-        
-        let imageUrl = NSURL(string: baseUrl + posterPath)
-        
-        let request = NSURLRequest(URL: imageUrl!)
-        let placeholderImage = UIImage(named: "MovieHolder")
-        
-        
-        // Older non - fade in code
-        //cell.posterView.setImageWithURL(imageUrl!)
-    
-        cell.posterView.alpha = 0
-        
-        // Get poster image and set animation options.
-        cell.posterView.setImageWithURLRequest(request, placeholderImage: placeholderImage, success: { (request, response, imageData) -> Void in
-            UIView.transitionWithView(cell.posterView, duration: 1.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { cell.posterView.image = imageData; cell.posterView.alpha = 2.0 }, completion: nil   );
-            
-            // If response was nil due to image being already cached then do this instead
-            if response == nil {
-                // Fade out images
-                UIView.animateWithDuration(0.1, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations:{ cell.posterView.alpha = 0}, completion: nil)
-                
-                // Fade in cached images
-                UIView.animateWithDuration(1.0, delay: 2.0, options: UIViewAnimationOptions.CurveEaseIn, animations:{ cell.posterView.alpha = 1}, completion: nil) }
-            }, failure: nil)
-        }
-            
-        // For posters who don't have a poster view yet.
-        else
-        {
-            cell.posterView.image = UIImage(named: "Rgvbn3m.jpg")
-            
-        }
-        
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
-
-        return cell
-        
-        
-    }
     
     func searchBar(searchBar : UISearchBar, textDidChange searchText: String) {
         filteredMovies = searchText.isEmpty ? movies : movies.filter({ (movie: NSDictionary) -> Bool in
@@ -188,9 +200,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.reloadData()
         
     }
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
+    
+	
+    
+    func networkErrorRefresh(sender: UIButton) {
+        print("Network error button pressed")
+        self.getMovieData()
+        print("loading movies")
+        noNetworkButton.hidden = true
+    }
+    
 
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
     
 
