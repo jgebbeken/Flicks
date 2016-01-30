@@ -11,25 +11,32 @@ import AFNetworking // adds in image url support
 import EZLoadingActivity
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
-    var movies: [NSDictionary]?
     
+    var movies: [NSDictionary] = []
+    var filteredMovies: [NSDictionary] = []
     var refreshControl: UIRefreshControl!
+    var filteredText: [String]!
     let noNetworklabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.dataSource = self
         tableView.delegate = self
+        searchBar.delegate = self
+    
+        
         
         // No network warning label
         
         noNetworklabel.textAlignment = NSTextAlignment.Center
-        noNetworklabel.text = "No Network. Pull to refresh."
+        noNetworklabel.text = "No Network."
         noNetworklabel.backgroundColor = UIColor.orangeColor()
         tableView.insertSubview(noNetworklabel, atIndex: 1)
         noNetworklabel.hidden = true
@@ -57,6 +64,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         MBProgressHUD.showHUDAddedTo(self.view, animated: true)
         
         
+        
         let task : NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
                 if let data = dataOrNil {
@@ -65,6 +73,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             NSLog("response: \(responseDictionary)")
                             
                             self.movies = responseDictionary["results"] as! [NSDictionary]
+                            self.filteredMovies = responseDictionary["results"] as! [NSDictionary]
+                        
                             
                             // End loading state HUD
                             MBProgressHUD.hideHUDForView(self.view, animated: true)
@@ -73,8 +83,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             self.tableView.reloadData()
 
                             print("loading complete")
-                          
-                            
                     }
                 }
         });
@@ -107,8 +115,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-    
-    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -117,36 +123,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        // Return movies count if there is any movies otherwise return 0 if there isn't any.
-        if let movies = movies {
-            
-            if noNetworklabel.hidden == false
-            {
-                noNetworklabel.hidden = true
-            }
-            
-            
-            return movies.count
-            
-          
-            
-        } else {
-            
-            
-            // Return count of 0 so that the app does not crash.
-            noNetworklabel.hidden = false
-            
-            return 0
-            
-        }
-
+            return filteredMovies.count
     }
+    
+    
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         
-        let movie = movies![indexPath.row]
+        let movie = filteredMovies[indexPath.row]
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
@@ -193,8 +179,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-    
-    
+    func searchBar(searchBar : UISearchBar, textDidChange searchText: String) {
+        filteredMovies = searchText.isEmpty ? movies : movies.filter({ (movie: NSDictionary) -> Bool in
+            let title = movie["title"] as! String
+            return title.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+        })
+        
+        tableView.reloadData()
+        
+    }
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
