@@ -2,7 +2,9 @@
 
 **Flicks** is a movies app using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: **X** hours spent in total
+Time spent: **20** hours spent in total
+
+note: I just realized (1/30/2016)that I was pushing changes with my other username instead of my school username that I use only for my university. Not sure how to fix it and I am afraid of breaking my github settings in Xcode.
 
 ## User Stories
 
@@ -17,19 +19,21 @@ The following **optional** features are implemented:
 
 - [x] User sees an error message when there's a networking error.
 - [ ] Movies are displayed using a CollectionView instead of a TableView.
-- [ ] User can search for a movie.
+- [x] User can search for a movie.
 - [x] All images fade in as they are loading.
 - [x] Customize the UI.
 
 The following **additional** features are implemented:
 
 - [x] If poster image is not available then a no image placeholder will take its place.
+- [x] Uses a UILongPressGestureRecognizer with a 2 second hold to refresh table data in a event the network was previously down.
+- [x] Search bar disappears from view if the network is down and will reappear if it's available again.
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/VZsg5p0.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
