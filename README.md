@@ -4,7 +4,7 @@
 
 Time spent: **20** hours spent in total
 
-note: I just realized (1/30/2016)that I was pushing changes with my other username instead of my school username that I use only for my university. Not sure how to fix it and I am afraid of breaking my github settings in Xcode.
+Note: I just realized (1/30/2016) that I was pushing changes with my other username instead of my school username that I use only for my university. Not sure how to fix it and I am afraid of breaking my github settings in Xcode.
 
 ## User Stories
 
