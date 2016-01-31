@@ -21,7 +21,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var filteredMovies: [NSDictionary] = []
     var refreshControl: UIRefreshControl!
     var filteredText: [String]!
-    let noNetworkButton = UIButton(frame: CGRectMake(0, 0, 320, 50))
+    let noNetworkLabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
     
     
     override func viewDidLoad() {
@@ -34,12 +34,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         // No network warning label
         
-        noNetworkButton.setTitle("No Network press to refresh", forState: .Normal)
-        noNetworkButton.backgroundColor = UIColor.orangeColor()
-        tableView.insertSubview(noNetworkButton, atIndex: 1)
-        noNetworkButton.addTarget(self, action: "networkErrorRefresh", forControlEvents: .TouchUpInside)
-        noNetworkButton.hidden = true
-    
+        noNetworkLabel.textAlignment = NSTextAlignment.Center
+        noNetworkLabel.text = "No Network. Press and Hold to refresh"
+        noNetworkLabel.backgroundColor = UIColor.orangeColor()
+        tableView.insertSubview(noNetworkLabel, atIndex: 1)
+        noNetworkLabel.hidden = true
+        
+        // Long Press Gesture Recognizer to refresh table when network was down.
+        let noNetworkLabelHold: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "networkErrorRefreshHold")
+        view.addGestureRecognizer(noNetworkLabelHold)
+        noNetworkLabelHold.minimumPressDuration = 2
+        
         
         // Refresh controls added to table view
         refreshControl = UIRefreshControl()
@@ -66,9 +71,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         )
         
         // Start loading state HUD
-        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
-        
-        
+        let spinning = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        spinning.labelText = "Loading"
+        spinning.detailsLabelText = "Movie Data"
         
         let task : NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
@@ -91,6 +96,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                 }
                 if error != nil {
+                    MBProgressHUD.hideHUDForView(self.view, animated: true)
                     self.showNetworkError()
                 }
         });
@@ -102,9 +108,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func showNetworkError () -> () {
         
         // Show no NetworkLabel and hide searchBar from view in till network is up.
-        noNetworkButton.hidden = false
+        noNetworkLabel.hidden = false
         searchBar.hidden = true
-        getMovieData()
+        
+        
     }
     
     
@@ -201,13 +208,27 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-	
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        self.searchBar.showsCancelButton = true
+    }
     
-    func networkErrorRefresh(sender: UIButton) {
-        print("Network error button pressed")
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        getMovieData()
+        
+    }
+    
+
+    
+    func networkErrorRefreshHold() {
+        print("Network error long guesture was sent.")
         self.getMovieData()
         print("loading movies")
-        noNetworkButton.hidden = true
+        noNetworkLabel.hidden = true
+        searchBar.hidden = false
+
     }
     
 
