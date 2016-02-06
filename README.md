@@ -61,10 +61,10 @@ One challenge I was having is how to interact with a label to act as a button on
     See the License for the specific language governing permissions and
     limitations under the License.
     
+##    
     
     
-    
-    # Project 2 - *extension of the Flicks application*
+# Project 2 - *extension of the Flicks application*
 
 **Name of your app** is a movies app displaying box office and top rental DVDs using [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
