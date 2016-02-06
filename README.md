@@ -66,7 +66,7 @@ One challenge I was having is how to interact with a label to act as a button on
     
 # Project 2 - *extension of the Flicks application*
 
-**Name of your app** is a movies app displaying box office and top rental DVDs using [The Movie Database API](http://docs.themoviedb.apiary.io/#).
+**Flicks** is a movies app displaying box office and top rental DVDs using [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
 Time spent: **X** hours spent in total
 
