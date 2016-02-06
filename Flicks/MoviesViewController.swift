@@ -15,13 +15,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
-    
+    @IBOutlet weak var noNetwork: UIView!
+    @IBOutlet weak var btnCloseNoNetworkView: UIButton!
+    @IBOutlet weak var noNetworkLabel: UILabel!
     
     var movies: [NSDictionary] = []
     var filteredMovies: [NSDictionary] = []
     var refreshControl: UIRefreshControl!
     var filteredText: [String]!
-    let noNetworkLabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
+   // let noNetworkLabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
+
+  //  var disableGesture = true // tap gesture is only enabled when it detects if the network is down.
+    
     
     
     override func viewDidLoad() {
@@ -30,21 +35,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         searchBar.delegate = self
-        
-        
-        // No network warning label
-        
-        noNetworkLabel.textAlignment = NSTextAlignment.Center
-        noNetworkLabel.text = "No Network. Press and Hold to refresh"
-        noNetworkLabel.backgroundColor = UIColor.orangeColor()
-        tableView.insertSubview(noNetworkLabel, atIndex: 1)
-        noNetworkLabel.hidden = true
-        
-        // Long Press Gesture Recognizer to refresh table when network was down.
-        let noNetworkLabelHold: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "networkErrorRefreshHold")
-        view.addGestureRecognizer(noNetworkLabelHold)
-        noNetworkLabelHold.minimumPressDuration = 2
-        
+        self.navigationItem.titleView = self.searchBar
+
+        noNetwork.hidden = true
+        view.bringSubviewToFront(noNetwork)
+        btnCloseNoNetworkView.addTarget(self, action: "networkErrorRefresh:", forControlEvents: UIControlEvents.TouchUpInside)
+  
         
         // Refresh controls added to table view
         refreshControl = UIRefreshControl()
@@ -106,10 +102,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     func showNetworkError () -> () {
-        
-        // Show no NetworkLabel and hide searchBar from view in till network is up.
-        noNetworkLabel.hidden = false
+
         searchBar.hidden = true
+        noNetwork.hidden = false
+        
         
         
     }
@@ -219,12 +215,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
 
     
-    func networkErrorRefreshHold() {
-        print("Network error long guesture was sent.")
+    func networkErrorRefresh(sender: UIButton!) {
+        print("Network refresh sent.")
+        noNetwork.hidden = true
+        searchBar.hidden = false
         self.getMovieData()
         print("loading movies")
-        noNetworkLabel.hidden = true
-        searchBar.hidden = false
+  //    noNetworkLabel.hidden = true
+        
 
     }
     
