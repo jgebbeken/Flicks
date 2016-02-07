@@ -97,9 +97,10 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-Walkthrough video below I can't seem to shrink the file size for github to like it.
-<img src='http://i.imgur.com/mRXUg8m.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-if the link doesn't work you can see this one [Walkthrough](http://i.imgur.com/mRXUg8m.gif)
+![walkthrough4](https://cloud.githubusercontent.com/assets/14221032/12871330/e021505e-cd31-11e5-9e9a-5d42af7bff66.gif)
+
+For a higher resolution animated gif please check out the link below. I had to cut back on the animated image because it was too big for github.
+ [higher resolution image](http://i.imgur.com/mRXUg8m.gif)
 
 
 
