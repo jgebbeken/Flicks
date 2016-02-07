@@ -90,8 +90,8 @@ The following **additional** features are implemented:
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1. 
-2. 
+1. Maybe providing ways add the searchbar into the navigation bar. I was able to do this only in the tableView but not in a collection view.
+2. Using other JSON like swifty since I did not implement that on my movie app.
 
 ## Video Walkthrough 
 
