@@ -5,38 +5,41 @@
 //  Created by Josh Gebbeken on 1/7/16.
 //  Copyright © 2016 Josh Gebbeken. All rights reserved.
 //
+//
+//   Icons created by Berkay Sargin and Daaouna Jeong from the
+//   Noun Project
 
 import UIKit
 import AFNetworking // adds in image url support
 import EZLoadingActivity
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+class MoviesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UISearchBarDelegate {
 
-    @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var noNetwork: UIView!
     @IBOutlet weak var btnCloseNoNetworkView: UIButton!
     @IBOutlet weak var noNetworkLabel: UILabel!
+
+    @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet weak var collectionView: UICollectionView!
     
     var movies: [NSDictionary] = []
     var filteredMovies: [NSDictionary] = []
     var refreshControl: UIRefreshControl!
     var filteredText: [String]!
-   // let noNetworkLabel = UILabel(frame: CGRectMake(0, 0, 320, 50))
-
-  //  var disableGesture = true // tap gesture is only enabled when it detects if the network is down.
     
-    
+    var endpoint: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.dataSource = self
-        tableView.delegate = self
+        collectionView.dataSource = self
+        collectionView.delegate = self
         searchBar.delegate = self
-        self.navigationItem.titleView = self.searchBar
+        
+    
 
+        // No Network UIView and controls
         noNetwork.hidden = true
         view.bringSubviewToFront(noNetwork)
         btnCloseNoNetworkView.addTarget(self, action: "networkErrorRefresh:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -46,7 +49,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl = UIRefreshControl()
         refreshControl.tintColor = UIColor.whiteColor()
         refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
-        tableView.insertSubview(refreshControl, atIndex: 0)
+        collectionView.insertSubview(refreshControl, atIndex: 0)
+        
+        if endpoint == "now_playing"
+        {
+            self.navigationItem.title = "Now Playing"
+        }
+        else
+        {
+            self.navigationItem.title = "Top Rated"
+        }
         
         
         // Load Movie Data
@@ -58,7 +70,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
        // Do any additional setup after loading the view.
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-        let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let url = NSURL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
         let request = NSURLRequest(URL: url!)
         let session = NSURLSession(
             configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
@@ -86,7 +98,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             MBProgressHUD.hideHUDForView(self.view, animated: true)
                             
                             // Reload table data
-                            self.tableView.reloadData()
+                            self.collectionView.reloadData()
 
                             print("loading complete")
                     }
@@ -105,19 +117,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
         searchBar.hidden = true
         noNetwork.hidden = false
-        
-        
-        
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
-        
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         let movie = filteredMovies[indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
         
         if let posterPath = movie["poster_path"] as? String {
             let baseUrl = "http://image.tmdb.org/t/p/w500"
@@ -151,20 +157,27 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             
         }
         
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
-        
         return cell
         
         
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return filteredMovies.count
     }
-
     
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
+        cell.contentView.backgroundColor = UIColor.orangeColor()
+    }
+    
+    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
+        cell.contentView.backgroundColor = UIColor.clearColor()
+    }
     
     // onRefresh Methods
     func delay(delay:Double, closure:()->()) {
@@ -178,16 +191,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func onRefresh() {
         
-        
-        
         delay(4, closure: {
             
             self.refreshControl.endRefreshing()
-            
         })
-        
-    
-        
     }
     
     
@@ -197,7 +204,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             return title.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
         })
         
-        tableView.reloadData()
+        collectionView.reloadData()
         
     }
     
@@ -221,12 +228,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         searchBar.hidden = false
         self.getMovieData()
         print("loading movies")
-  //    noNetworkLabel.hidden = true
+
         
 
     }
     
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -238,9 +245,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
-        let cell = sender as! UITableViewCell
-        let indexPath = tableView.indexPathForCell(cell)
-        let movie = movies[indexPath!.row]
+        let cell = sender as! UICollectionViewCell
+        let indexPath = collectionView.indexPathForCell(cell)
+        let movie = filteredMovies[indexPath!.row]
+        
 
         let detailViewController = segue.destinationViewController as! DetailViewController
         detailViewController.movie = movie
