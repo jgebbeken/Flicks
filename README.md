@@ -99,6 +99,7 @@ Here's a walkthrough of implemented user stories:
 
 Walkthrough video below I can't seem to shrink the file size for github to like it.
 <img src='http://i.imgur.com/mRXUg8m.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+if the link doesn't work you can see this one [Walkthrough](http://i.imgur.com/mRXUg8m.gif)
 
 
 
